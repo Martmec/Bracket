@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-navy: #0B1B2B;
+  --color-brand-navy2: #0E2338;
+  --color-brand-panel: #0F2134;
+  --color-brand-border: #1E2C3E;
+  --color-brand-purple: #5A1FBF;
+  --color-brand-purple2: #7B2DCC;
+  --color-brand-highlight: #8F7CFF;
+  --color-brand-green: #21D07A;
+}
+
+/* Global Reset/Background to avoid white browser edge */
+html, body {
+  margin: 0;
+  background-color: var(--color-brand-navy2);
+  min-height: 100%;
+}
+#root { min-height: 100%; }
