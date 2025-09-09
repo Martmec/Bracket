@@ -35,7 +35,7 @@ const fixedResults: Record<string, 'player1' | 'player2'> = {
 
 const getFlagEmoji = (country: string): string => {
   const flags: Record<string, string> = {
-    'ITA': '🇮🇹', 'USA': '🇺��', 'AUS': '🇦🇺', 'ESP': '🇪🇸', 'ARG': '🇦🇷', 'CAN': '🇨🇦',
+    'ITA': '🇮🇹', 'USA': '🇺🇸', 'AUS': '🇦🇺', 'ESP': '🇪🇸', 'ARG': '🇦🇷', 'CAN': '🇨🇦',
     'BUL': '🇧🇬', 'POL': '🇵🇱', 'KAZ': '🇰🇿', 'GBR': '🇬🇧', 'FRA': '🇫🇷', 'RUS': '🇷🇺',
     'NED': '🇳🇱', 'CHN': '🇨🇳', 'CZE': '🇨🇿', 'GER': '🇩🇪', 'JPN': '🇯🇵', 'DEN': '🇩🇰',
     'SRB': '🇷🇸', 'CRO': '🇭🇷', 'HUN': '🇭🇺', 'GRE': '🇬🇷', 'COL': '🇨🇴', 'POR': '🇵🇹',
@@ -48,7 +48,7 @@ const getFlagEmoji = (country: string): string => {
 // Tournament configurations
 const tournamentConfigs = {
   tokyo2025: {
-    name: 'Tokyo 2025',
+    name: 'Tokyo 2025 (ATP)',
     location: 'Tokyo, Japan',
     surface: 'Hard',
     category: '500 Series',
@@ -56,7 +56,7 @@ const tournamentConfigs = {
     slug: 'tokyo-2025'
   },
   saopaulo2025: {
-    name: 'São Paulo 2025',
+    name: 'São Paulo 2025 (WTA)',
     location: 'São Paulo, Brazil',
     surface: 'Hard',
     category: '250 Series',
@@ -64,7 +64,7 @@ const tournamentConfigs = {
     slug: 'sao-paulo-2025'
   },
   beijing2025: {
-    name: 'Beijing 2025',
+    name: 'Beijing 2025 (ATP)',
     location: 'Beijing, China',
     surface: 'Hard',
     category: '500 Series',

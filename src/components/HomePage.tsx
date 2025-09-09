@@ -16,29 +16,29 @@ type Tournament = {
 const tournaments: Tournament[] = [
   {
     id: 'tokyo2025',
-    name: 'Tokyo 2025',
+    name: 'Tokyo 2025 (ATP)',
     category: '500 Series',
     dates: 'September 24 - 30, 2025',
     location: 'Tokyo, Japan',
     surface: 'Hard',
     players: 32,
-    status: 'active',
+    status: 'upcoming',
     description: ''
   },
   {
     id: 'saopaulo2025',
-    name: 'São Paulo 2025',
+    name: 'São Paulo 2025 (WTA)',
     category: '250 Series',
     dates: 'September 8 - 14, 2025',
     location: 'São Paulo, Brazil',
     surface: 'Hard',
     players: 32,
-    status: 'active',
+    status: 'upcoming',
     description: ''
   },
   {
     id: 'beijing2025',
-    name: 'Beijing 2025',
+    name: 'Beijing 2025 (ATP)',
     category: '500 Series',
     dates: 'September 25 - October 1, 2025',
     location: 'Beijing, China',
