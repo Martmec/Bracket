@@ -26,6 +26,17 @@ const tournaments: Tournament[] = [
     description: ''
   },
   {
+    id: 'saopaulo2025',
+    name: 'São Paulo 2025',
+    category: '250 Series',
+    dates: 'January 20 - 26, 2025',
+    location: 'São Paulo, Brazil',
+    surface: 'Clay',
+    players: 32,
+    status: 'active',
+    description: ''
+  },
+  {
     id: 'beijing2025',
     name: 'Beijing 2025',
     category: '500 Series',
