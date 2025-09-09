@@ -586,7 +586,22 @@ const TournamentPage: React.FC = () => {
 
         <div className="flex gap-6 sm:gap-8">
           <div className="flex-1">
-            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 px-4">{currentRound <= 7 ? `Round of ${rounds[currentRound - 1].players}` : 'Tournament Complete'}</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 px-4">
+              {currentRound <= totalRounds ? 
+                (() => {
+                  const round = rounds[currentRound - 1]
+                  switch (round.name) {
+                    case 'R32': return 'Round of 32'
+                    case 'R16': return 'Round of 16'
+                    case 'QF': return 'Quarterfinals'
+                    case 'SF': return 'Semifinals'
+                    case 'F': return 'Finals'
+                    default: return `Round of ${round.players}`
+                  }
+                })() : 
+                'Tournament Complete'
+              }
+            </h2>
             <div className="space-y-3 sm:space-y-4">
               {currentMatches.map((match, index) => {
                 return (
