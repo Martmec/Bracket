@@ -58,9 +58,9 @@ const tournamentConfigs = {
   saopaulo2025: {
     name: 'São Paulo 2025',
     location: 'São Paulo, Brazil',
-    surface: 'Clay',
+    surface: 'Hard',
     category: '250 Series',
-    dates: 'January 20 - 26, 2025',
+    dates: 'September 8 - 14, 2025',
     slug: 'sao-paulo-2025'
   },
   beijing2025: {
