@@ -200,21 +200,13 @@ const tournamentConfigs = {
     dates: 'September 24 - 30, 2025',
     slug: 'tokyo-2025'
   },
-  wimbledon2025: {
-    name: 'Wimbledon 2025',
-    location: 'London, UK',
-    surface: 'Grass',
-    category: 'Grand Slam',
-    dates: 'July 1 - 14, 2025',
-    slug: 'wimbledon-2025'
-  },
-  usopen2024: {
-    name: 'US Open 2024',
-    location: 'New York, USA',
+  beijing2025: {
+    name: 'Beijing Open 2025',
+    location: 'Beijing, China',
     surface: 'Hard',
-    category: 'Grand Slam',
-    dates: 'August 26 - September 8, 2024',
-    slug: 'us-open-2024'
+    category: '500 Series',
+    dates: 'September 25 - October 1, 2025',
+    slug: 'beijing-2025'
   }
 }
 

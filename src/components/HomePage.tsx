@@ -26,26 +26,15 @@ const tournaments: Tournament[] = [
     description: 'ATP 500 tournament featuring top players in Tokyo. First round matches are underway!'
   },
   {
-    id: 'wimbledon2025',
-    name: 'Wimbledon 2025',
-    category: 'Grand Slam',
-    dates: 'July 1 - 14, 2025',
-    location: 'London, UK',
-    surface: 'Grass',
-    players: 128,
-    status: 'upcoming',
-    description: 'The most prestigious tennis tournament in the world. Make your predictions for the grass court season!'
-  },
-  {
-    id: 'usopen2024',
-    name: 'US Open 2024',
-    category: 'Grand Slam',
-    dates: 'August 26 - September 8, 2024',
-    location: 'New York, USA',
+    id: 'beijing2025',
+    name: 'Beijing Open 2025',
+    category: '500 Series',
+    dates: 'September 25 - October 1, 2025',
+    location: 'Beijing, China',
     surface: 'Hard',
-    players: 128,
-    status: 'completed',
-    description: 'The final Grand Slam of 2024. Tournament completed - view results and statistics.'
+    players: 32,
+    status: 'upcoming',
+    description: 'ATP 500 tournament in Beijing. Coming soon - get ready to make your predictions!'
   }
 ]
 
