@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-interface Tournament {
+type Tournament = {
   id: string
   name: string
   category: string
@@ -58,28 +58,21 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-navy via-brand-navy2 to-brand-purple">
-      {/* Header */}
-      <div className="bg-brand-panel/90 backdrop-blur-sm border-b border-brand-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Your Tennis Bracket
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto">
-              Predict tournament outcomes and compete with friends. 
-              Make your picks for tennis tournaments around the world.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-brand-navy via-brand-navy2 to-brand-purple p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center py-8 sm:py-12">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+            Your Tennis Bracket
+          </h1>
+          <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto">
+            Predict tournament outcomes and compete with friends.
+            Make your picks for tennis tournaments around the world.
+          </p>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Tournament Selection */}
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-            Current Tournaments
-          </h2>
           <p className="text-slate-300 text-lg">
             Select a tournament to make your predictions
           </p>
@@ -102,12 +95,15 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Tournament Info */}
+              {/* Tournament Header */}
               <div className="p-6 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 pr-16 group-hover:text-brand-purple transition-colors">
                   {tournament.name}
                 </h3>
-                
+              </div>
+
+              {/* Tournament Info */}
+              <div className="p-6 sm:p-8">
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center text-slate-300">
                     <span className="text-brand-purple mr-2">📍</span>
@@ -155,7 +151,7 @@ const HomePage: React.FC = () => {
           })}
         </div>
 
-        {/* Footer Info */}
+        {/* How It Works */}
         <div className="mt-12 sm:mt-16 text-center">
           <div className="bg-brand-panel/50 backdrop-blur-sm rounded-xl border border-brand-border p-6 sm:p-8">
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
@@ -175,6 +171,35 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-16 sm:mt-20 pt-8 border-t border-brand-border">
+          <div className="text-center">
+            <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
+              <Link 
+                to="/impressum" 
+                className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+              >
+                Impressum
+              </Link>
+              <Link 
+                to="/datenschutz" 
+                className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+              >
+                Datenschutz
+              </Link>
+              <Link 
+                to="/terms" 
+                className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+              >
+                Nutzungsbedingungen
+              </Link>
+            </div>
+            <p className="text-slate-400 text-xs sm:text-sm">
+              © 2025 Your Tennis Bracket. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   )
