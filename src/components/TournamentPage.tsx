@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Share2, RotateCcw, Download, ArrowLeft } from 'lucide-react'
+import { Share2, Trophy, Users, RotateCcw, Download, ArrowLeft } from 'lucide-react'
 import jsPDF from 'jspdf'
 
 type Player = {
@@ -35,7 +35,7 @@ const fixedResults: Record<string, 'player1' | 'player2'> = {
 
 const getFlagEmoji = (country: string): string => {
   const flags: Record<string, string> = {
-    'ITA': '🇮🇹', 'USA': '🇺🇸', 'AUS': '🇦🇺', 'ESP': '🇪🇸', 'ARG': '🇦🇷', 'CAN': '🇨🇦',
+    'ITA': '🇮🇹', 'USA': '🇺��', 'AUS': '🇦🇺', 'ESP': '🇪🇸', 'ARG': '🇦🇷', 'CAN': '🇨🇦',
     'BUL': '🇧🇬', 'POL': '🇵🇱', 'KAZ': '🇰🇿', 'GBR': '🇬🇧', 'FRA': '🇫🇷', 'RUS': '🇷🇺',
     'NED': '🇳🇱', 'CHN': '🇨🇳', 'CZE': '🇨🇿', 'GER': '🇩🇪', 'JPN': '🇯🇵', 'DEN': '🇩🇰',
     'SRB': '🇷🇸', 'CRO': '🇭🇷', 'HUN': '🇭🇺', 'GRE': '🇬🇷', 'COL': '🇨🇴', 'POR': '🇵🇹',
@@ -43,6 +43,34 @@ const getFlagEmoji = (country: string): string => {
     'TUR': '🇹🇷', 'SVK': '🇸🇰', 'BRA': '🇧🇷'
   }
   return flags[country] || '🏳️'
+}
+
+// Tournament configurations
+const tournamentConfigs = {
+  tokyo2025: {
+    name: 'Tokyo 2025',
+    location: 'Tokyo, Japan',
+    surface: 'Hard',
+    category: '500 Series',
+    dates: 'September 24 - 30, 2025',
+    slug: 'tokyo-2025'
+  },
+  saopaulo2025: {
+    name: 'São Paulo 2025',
+    location: 'São Paulo, Brazil',
+    surface: 'Clay',
+    category: '250 Series',
+    dates: 'January 20 - 26, 2025',
+    slug: 'sao-paulo-2025'
+  },
+  beijing2025: {
+    name: 'Beijing 2025',
+    location: 'Beijing, China',
+    surface: 'Hard',
+    category: '500 Series',
+    dates: 'September 25 - October 1, 2025',
+    slug: 'beijing-2025'
+  }
 }
 
 const generatePlayers = (tournamentId?: string): Player[] => {
@@ -137,39 +165,13 @@ const generatePlayers = (tournamentId?: string): Player[] => {
   }))
 }
 
-// Tournament configurations
-const tournamentConfigs = {
-  tokyo2025: {
-    name: 'Tokyo 2025',
-    location: 'Tokyo, Japan',
-    surface: 'Hard',
-    category: '500 Series',
-    dates: 'September 24 - 30, 2025',
-    slug: 'tokyo-2025'
-  },
-  saopaulo2025: {
-    name: 'São Paulo 2025',
-    location: 'São Paulo, Brazil',
-    surface: 'Clay',
-    category: '250 Series',
-    dates: 'January 20 - 26, 2025',
-    slug: 'sao-paulo-2025'
-  },
-  beijing2025: {
-    name: 'Beijing 2025',
-    location: 'Beijing, China',
-    surface: 'Hard',
-    category: '500 Series',
-    dates: 'September 25 - October 1, 2025',
-    slug: 'beijing-2025'
-  }
-}
-
 const TournamentPage: React.FC = () => {
   const { tournamentId } = useParams<{ tournamentId: string }>()
   const [players] = useState<Player[]>(generatePlayers(tournamentId))
   const [currentRound, setCurrentRound] = useState<number>(1)
-  const [predictions, setPredictions] = useState<Record<string, 'player1' | 'player2'>>({})
+  const [predictions, setPredictions] = useState<Record<string, 'player1' | 'player2' | undefined>>({})
+  
+  const [champion, setChampion] = useState<Player | null>(null)
 
   const tournamentConfig = tournamentConfigs[tournamentId as keyof typeof tournamentConfigs] || tournamentConfigs.tokyo2025
 
@@ -195,357 +197,488 @@ const TournamentPage: React.FC = () => {
     }
   }, [])
 
-  const generateMatches = (round: number): Match[] => {
-    const matches: Match[] = []
-    const roundInfo = rounds[round - 1]
-    const matchesInRound = roundInfo.matches
-
-    for (let i = 0; i < matchesInRound; i++) {
-      const matchId = `r${round}-m${i + 1}`
-      const isCompleted = fixedResults[matchId] !== undefined
-      
-      let player1: Player | null = null
-      let player2: Player | null = null
-
-      if (round === 1) {
-        // First round - use direct player positions
-        const pos1 = i * 2 + 1
-        const pos2 = i * 2 + 2
-        player1 = players.find(p => p.position === pos1) || null
-        player2 = players.find(p => p.position === pos2) || null
-      } else {
-        // Later rounds - use winners from previous round
-        const prevRound = round - 1
-        const prevMatch1 = `r${prevRound}-m${i * 2 + 1}`
-        const prevMatch2 = `r${prevRound}-m${i * 2 + 2}`
-        
-        player1 = getMatchWinner(prevMatch1, prevRound)
-        player2 = getMatchWinner(prevMatch2, prevRound)
+  useEffect(() => {
+    const finalMatch = predictions[`r${totalRounds}-m1`]
+    if (finalMatch) {
+      const finalMatches = generateMatches(totalRounds)
+      if (finalMatches.length > 0) {
+        const match = finalMatches[0]
+        const winner = finalMatch === 'player1' ? match.player1 : match.player2
+        setChampion(winner || null)
       }
-
-      matches.push({
-        id: matchId,
-        player1,
-        player2,
-        round,
-        matchNumber: i + 1,
-        status: isCompleted ? 'completed' : 'upcoming',
-        fixedResult: fixedResults[matchId]
-      })
+    } else {
+      setChampion(null)
     }
+  }, [predictions])
 
-    return matches
-  }
-
-  const getMatchWinner = (matchId: string, round: number): Player | null => {
-    const match = generateMatches(round).find(m => m.id === matchId)
+  const getMatchWinner = (matchId: string, match: Match | undefined): Player | null => {
     if (!match) return null
-
-    // Check if there's a fixed result first
+    
+    // Check if match has a fixed result first
     if (fixedResults[matchId]) {
       return fixedResults[matchId] === 'player1' ? match.player1 : match.player2
     }
-
-    // Check user predictions
-    const prediction = predictions[matchId]
-    if (prediction && match.player1 && match.player2) {
-      return prediction === 'player1' ? match.player1 : match.player2
-    }
-
-    return null
+    
+    // Otherwise check predictions
+    if (!predictions[matchId]) return null
+    return predictions[matchId] === 'player1' ? match.player1 : match.player2
   }
 
-  const handlePrediction = (matchId: string, winner: 'player1' | 'player2') => {
-    // Don't allow changes to fixed results
-    if (fixedResults[matchId]) {
-      return
+  const generateMatches = (roundId: number): Match[] => {
+    if (roundId === 1) {
+      const matches: Match[] = []
+      const firstRoundMatches = Math.floor(players.length / 2)
+      for (let i = 0; i < firstRoundMatches; i++) {
+        const player1 = players[i * 2]
+        const player2 = players[i * 2 + 1]
+        const matchId = `r1-m${i + 1}`
+        const match: Match = {
+          id: matchId,
+          player1,
+          player2,
+          round: 1,
+          matchNumber: i + 1
+        }
+        
+        // Check if match is already completed
+        if (fixedResults[matchId]) {
+          match.status = 'completed'
+          match.fixedResult = fixedResults[matchId]
+        } else {
+          match.status = 'upcoming'
+        }
+        
+        matches.push(match)
+      }
+      return matches
     }
 
-    setPredictions(prev => ({
+    const prevRoundMatches = generateMatches(roundId - 1)
+    const matches: Match[] = []
+    const matchCount = Math.pow(2, totalRounds - roundId)
+
+    for (let i = 0; i < matchCount; i++) {
+      const match1Id = `r${roundId - 1}-m${i * 2 + 1}`
+      const match2Id = `r${roundId - 1}-m${i * 2 + 2}`
+      const winner1 = getMatchWinner(match1Id, prevRoundMatches[i * 2])
+      const winner2 = getMatchWinner(match2Id, prevRoundMatches[i * 2 + 1])
+      const matchId = `r${roundId}-m${i + 1}`
+      const match: Match = {
+        id: matchId,
+        player1: winner1,
+        player2: winner2,
+        round: roundId,
+        dependsOn: [match1Id, match2Id],
+        matchNumber: i + 1
+      }
+      
+      // Check if match is already completed
+      if (fixedResults[matchId]) {
+        match.status = 'completed'
+        match.fixedResult = fixedResults[matchId]
+      } else {
+        match.status = 'upcoming'
+      }
+      
+      matches.push(match)
+    }
+    return matches
+  }
+
+  const currentMatches = generateMatches(currentRound)
+
+  const handlePrediction = (matchId: string, winner: 'player1' | 'player2') => {
+    // Check if match is already completed
+    if (fixedResults[matchId]) {
+      return // No changes allowed for completed matches
+    }
+    
+    setPredictions((prev) => ({
       ...prev,
       [matchId]: winner
     }))
   }
 
-  const currentRoundMatches = generateMatches(currentRound)
 
-  const isComplete = (round: number) => {
-    const roundMatches = generateMatches(round)
-    return roundMatches.every((m) => (fixedResults[m.id] || predictions[m.id]) && m.player1 && m.player2)
+  const getTotalPredictions = () => {
+    return Object.keys(predictions).length
+  }
+
+  const clearAllPredictions = () => {
+    if (confirm('Clear all predictions? This action cannot be undone.')) {
+      setPredictions({})
+      setChampion(null)
+    }
+  }
+
+
+  const shareResults = async () => {
+    const data = btoa(JSON.stringify(predictions))
+    const currentDomain = window.location.origin
+    const longUrl = `${currentDomain}/${tournamentId}?predictions=${data}`
+    
+    // Copy the URL directly to clipboard (no short URL due to CORS issues)
+    try {
+      await navigator.clipboard.writeText(longUrl)
+      alert('Share link copied to clipboard!')
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = longUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      alert('Share link copied to clipboard!')
+    }
   }
 
   const exportToPDF = () => {
     const doc = new jsPDF()
-    const margin = 20
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
     let yPosition = 20
 
-    // Title
+    // Header
     doc.setFontSize(20)
     doc.setFont('helvetica', 'bold')
-    doc.text(tournamentConfig.name, margin, yPosition)
+    doc.text(tournamentConfig.name, pageWidth / 2, yPosition, { align: 'center' })
     yPosition += 10
 
-    // Tournament details
     doc.setFontSize(12)
     doc.setFont('helvetica', 'normal')
-    doc.text(`${tournamentConfig.location} • ${tournamentConfig.surface} • ${tournamentConfig.dates}`, margin, yPosition)
-    yPosition += 15
+    doc.text(`${tournamentConfig.category} • ${tournamentConfig.dates}`, pageWidth / 2, yPosition, { align: 'center' })
+    yPosition += 20
 
     // Tournament Bracket
     doc.setFontSize(16)
     doc.setFont('helvetica', 'bold')
-    doc.text('Tournament Bracket', margin, yPosition)
-    yPosition += 10
+    doc.text('Tournament Bracket', 20, yPosition)
+    yPosition += 15
 
-    // Add matches for all rounds
-    rounds.forEach((round) => {
-      const roundMatches = generateMatches(round.id)
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    
+    for (let round = 1; round <= totalRounds; round++) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage()
+        yPosition = 20
+      }
+
+      const roundMatches = generateMatches(round)
+      const roundName = rounds[round - 1]?.name || `Round ${round}`
       
-      doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      const roundName = round.name === 'R32' ? 'Round of 32' :
-                       round.name === 'R16' ? 'Round of 16' :
-                       round.name === 'QF' ? 'Quarterfinals' :
-                       round.name === 'SF' ? 'Semifinals' :
-                       round.name === 'F' ? 'Final' : `Round of ${round.players}`
-      doc.text(roundName, margin, yPosition)
-      yPosition += 8
+      doc.text(roundName, 20, yPosition)
+      yPosition += 10
 
+      doc.setFont('helvetica', 'normal')
       roundMatches.forEach((match) => {
-        if (match.player1 && match.player2) {
-          const isFixed = fixedResults[match.id] !== undefined
-          const winner = getMatchWinner(match.id, round.id)
-          
-          let matchText = ''
-          if (winner) {
-            // Bold and underline the winner
-            matchText = `${winner.name} wins vs. ${match.player1.id === winner.id ? match.player2.name : match.player1.name}`
-            if (isFixed) {
-              matchText += ' (Already completed)'
-            }
-          } else {
-            matchText = `${match.player1.name} vs. ${match.player2.name}`
-          }
-
-          doc.setFontSize(10)
-          doc.setFont('helvetica', winner ? 'bold' : 'normal')
-          doc.text(matchText, margin + 10, yPosition)
-          yPosition += 6
-
-          if (yPosition > 280) {
-            doc.addPage()
-            yPosition = 20
-          }
+        if (yPosition > pageHeight - 20) {
+          doc.addPage()
+          yPosition = 20
         }
+
+        const player1Name = match.player1?.name || 'TBD'
+        const player2Name = match.player2?.name || 'TBD'
+        const prediction = predictions[match.id]
+        const fixedResult = fixedResults[match.id]
+        const isCompleted = match.status === 'completed'
+        
+        // Check if we have either a prediction or fixed result
+        const result = fixedResult || prediction
+        
+        if (result) {
+          const winner = result === 'player1' ? player1Name : player2Name
+          const loser = result === 'player1' ? player2Name : player1Name
+          
+          // Winner underlined
+          doc.setFont('helvetica', 'bold')
+          doc.text(winner, 30, yPosition)
+          const winnerWidth = doc.getTextWidth(winner)
+          
+          // " wins vs. "
+          doc.setFont('helvetica', 'normal')
+          doc.text(' wins vs. ', 30 + winnerWidth, yPosition)
+          const winsTextWidth = doc.getTextWidth(' wins vs. ')
+          
+          // Loser
+          doc.text(loser, 30 + winnerWidth + winsTextWidth, yPosition)
+          
+          // Add "(Already completed)" for fixed results
+          if (isCompleted) {
+            const loserWidth = doc.getTextWidth(loser)
+            doc.setFont('helvetica', 'italic')
+            doc.text(' (Already completed)', 30 + winnerWidth + winsTextWidth + loserWidth, yPosition)
+          }
+          
+          // Underline the winner
+          doc.line(30, yPosition + 1, 30 + winnerWidth, yPosition + 1)
+        } else {
+          // No prediction made
+          doc.text(`${player1Name} vs ${player2Name}`, 30, yPosition)
+        }
+        
+        yPosition += 8
       })
-      yPosition += 5
-    })
-
-    doc.save(`${tournamentConfig.slug}-bracket.pdf`)
-  }
-
-  const shareResults = async () => {
-    try {
-      const predictionsData = btoa(JSON.stringify(predictions))
-      const longUrl = `${window.location.origin}/${tournamentId}?predictions=${predictionsData}`
-      
-      await navigator.clipboard.writeText(longUrl)
-      alert('Bracket URL copied to clipboard!')
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error)
-      alert('Failed to copy URL. Please try again.')
+      yPosition += 8
     }
+
+    // Save PDF
+    const fileName = `${tournamentConfig.name.replace(/\s+/g, '_')}_Predictions.pdf`
+    doc.save(fileName)
   }
 
-  const resetBracket = () => {
-    setPredictions({})
-    setCurrentRound(1)
+  const getCompletionStats = () => {
+    let totalMatches = 0
+    let completedMatches = 0
+    for (let i = 1; i <= totalRounds; i++) {
+      const roundMatches = generateMatches(i)
+      totalMatches += roundMatches.length
+      completedMatches += roundMatches.filter((match) => predictions[match.id]).length
+    }
+    return { total: totalMatches, completed: completedMatches }
   }
+
+  const stats = getCompletionStats()
+
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-navy via-brand-navy2 to-brand-purple p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-brand-panel/90 backdrop-blur-sm rounded-xl border border-brand-border p-6 sm:p-8 mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-            <div>
-              <Link 
-                to="/" 
-                className="inline-flex items-center text-brand-purple hover:text-white transition-colors mb-4"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Tournaments
-              </Link>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-                {tournamentConfig.name}
-              </h1>
-              <p className="text-slate-300 text-sm sm:text-base">
-                {tournamentConfig.location} • {tournamentConfig.surface} • {tournamentConfig.dates}
-              </p>
+        {champion && (
+          <div className="bg-gradient-to-r from-brand-purple to-brand-purple2 rounded-lg shadow-lg p-4 sm:p-6 mb-6 text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Trophy className="w-8 h-8 text-white" />
+              <h2 className="text-xl sm:text-2xl font-bold text-white">{tournamentConfig.name} Champion</h2>
+              <Trophy className="w-8 h-8 text-white" />
             </div>
-            
-            <div className="flex flex-wrap gap-3 sm:gap-4 mt-4 sm:mt-0">
-              <button
-                onClick={exportToPDF}
-                className="flex items-center px-4 py-2 bg-brand-purple text-white rounded-lg hover:bg-brand-purple/80 transition-colors text-sm sm:text-base"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export PDF
-              </button>
-              <button
-                onClick={shareResults}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </button>
-              <button
-                onClick={resetBracket}
-                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm sm:text-base"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reset
-              </button>
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-3xl">{champion.flag}</span>
+              <span className="text-lg sm:text-xl font-semibold text-white">{champion.name}</span>
+              {champion.seed && (
+                <span className="bg-white text-brand-purple px-2 py-1 rounded font-bold text-sm">Seed {champion.seed}</span>
+              )}
             </div>
           </div>
+        )}
 
-          {/* Round Navigation */}
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            {rounds.map((round) => (
-              <button
-                key={round.id}
-                onClick={() => setCurrentRound(round.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                  currentRound === round.id
-                    ? 'bg-brand-purple text-white'
-                    : isComplete(round.id)
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
-                }`}
-              >
-                {round.name === 'R32' ? 'R32' :
-                 round.name === 'R16' ? 'R16' :
-                 round.name === 'QF' ? 'QF' :
-                 round.name === 'SF' ? 'SF' :
-                 round.name === 'F' ? 'F' : round.name}
-                {isComplete(round.id) && <span className="ml-1">✓</span>}
-              </button>
-            ))}
+        {/* Highlighted header + round navigation module */}
+        <div className="rounded-xl overflow-hidden shadow-2xl mb-4 sm:mb-6 border border-brand-border">
+          {/* Gradient header bar */}
+          <div className="bg-gradient-to-r from-brand-purple to-brand-purple2 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="text-center sm:text-left">
+                <Link 
+                  to="/" 
+                  className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-2 text-sm"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Tournaments
+                </Link>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">{tournamentConfig.name}</h1>
+                <p className="text-sm text-white/80">{tournamentConfig.category} • {tournamentConfig.surface}</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <button onClick={exportToPDF} className="flex items-center gap-2 bg-brand-green text-white px-4 py-3 rounded-lg hover:bg-brand-green/80 transition-colors text-sm">
+                  <Download className="w-4 h-4" /> PDF
+                </button>
+                <button onClick={clearAllPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                  <RotateCcw className="w-4 h-4" /> Reset
+                </button>
+                <button onClick={shareResults} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                  <Share2 className="w-4 h-4" /> Share
+                </button>
+              </div>
+            </div>
+          </div>
+          {/* Navigation body */}
+          <div className="bg-brand-panel/90 backdrop-blur-sm p-4 sm:p-6 border-t border-brand-border">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              {rounds.map((round) => {
+                const roundMatches = generateMatches(round.id)
+                const isComplete = roundMatches.every((m) => {
+                  // Check if match is completed (either fixed result or user prediction)
+                  const hasFixedResult = fixedResults[m.id]
+                  const hasUserPrediction = predictions[m.id]
+                  const isMatchComplete = hasFixedResult || hasUserPrediction
+                  
+                  // Also check that both players exist
+                  const hasBothPlayers = m.player1 && m.player2
+                  
+                  return isMatchComplete && hasBothPlayers
+                })
+                const isActive = currentRound === round.id
+                return (
+                  <button
+                    key={round.id}
+                    onClick={() => setCurrentRound(round.id)}
+                    className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 flex items-center justify-center font-semibold text-xs sm:text-sm transition-all
+                      ${isActive ? 'border-brand-purple bg-brand-purple/20 text-white' : isComplete ? 'border-brand-green bg-brand-green/20 text-brand-green' : 'border-brand-border text-slate-300 hover:border-brand-purple hover:text-white'}`}
+                  >
+                    {round.name}
+                    {isComplete && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-green rounded-full text-white text-xs flex items-center justify-center">✓</span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Current Round */}
-        <div className="bg-brand-panel/50 backdrop-blur-sm rounded-xl border border-brand-border p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 px-4">
-            {currentRound <= totalRounds ?
-              (() => {
-                const round = rounds[currentRound - 1]
-                switch (round.name) {
-                  case 'R32': return 'Round of 32'
-                  case 'R16': return 'Round of 16'
-                  case 'QF': return 'Quarterfinals'
-                  case 'SF': return 'Semifinals'
-                  case 'F': return 'Final'
-                  default: return `Round of ${round.players}`
-                }
-              })() :
-              'Tournament Complete'
-            }
-          </h2>
+        {/* Ad Space */}
+        <div className="bg-brand-panel/90 backdrop-blur-sm rounded-lg shadow-sm p-6 mb-4 sm:mb-6 border border-brand-border text-center">
+          <div className="text-brand-cream/60 text-sm">
+            Advertisement Space
+          </div>
+        </div>
 
-          <div className="space-y-3 sm:space-y-4">
-            {currentRoundMatches.map((match) => {
-              const isCompleted = match.status === 'completed'
-              const isDisabled = isCompleted
-
-              return (
-                <div key={match.id} className="bg-brand-panel/30 backdrop-blur-sm rounded-lg border border-brand-border p-4 sm:p-6">
-                  {isCompleted && (
-                    <div className="text-center mb-3">
-                      <span className="text-green-400 font-semibold text-sm">✓ COMPLETED</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    {match.player1 && (
-                      <button
-                        onClick={() => handlePrediction(match.id, 'player1')}
-                        disabled={isDisabled}
-                        className={`flex-1 p-4 sm:p-6 rounded-lg border-2 transition-all ${
-                          isDisabled
-                            ? 'bg-gray-600/30 border-gray-500 cursor-not-allowed opacity-75'
-                            : predictions[match.id] === 'player1'
-                            ? 'bg-green-600/20 border-green-500 text-green-300'
-                            : 'bg-brand-panel/50 border-brand-border hover:border-brand-purple hover:bg-brand-panel/70'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <span className="text-2xl sm:text-3xl">{match.player1.flag}</span>
-                            <div>
-                              <div className="font-semibold text-white text-base sm:text-lg">
-                                {match.player1.name}
-                                {isCompleted && match.fixedResult === 'player1' && (
-                                  <span className="ml-2 text-green-400">✓ COMPLETED</span>
+        <div className="flex gap-6 sm:gap-8">
+          <div className="flex-1">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 px-4">
+              {currentRound <= totalRounds ?
+                (() => {
+                  const round = rounds[currentRound - 1]
+                  switch (round.name) {
+                    case 'R32': return 'Round of 32'
+                    case 'R16': return 'Round of 16'
+                    case 'QF': return 'Quarterfinals'
+                    case 'SF': return 'Semifinals'
+                    case 'F': return 'Final'
+                    default: return `Round of ${round.players}`
+                  }
+                })() :
+                'Tournament Complete'
+              }
+            </h2>
+            <div className="space-y-3 sm:space-y-4">
+              {currentMatches.map((match, index) => {
+                return (
+                  <div key={match.id} className="relative">
+                    <div className="bg-brand-panel border border-brand-border rounded-lg overflow-hidden">
+                      <div className="px-3 py-1 bg-brand-border border-b border-brand-border">
+                        <span className="text-slate-400 text-xs">Game {match.matchNumber || index + 1}</span>
+                      </div>
+                      <div>
+                        {(() => {
+                          const isCompleted = match.status === 'completed'
+                          const isDisabled = isCompleted || !match.player1 || !match.player2
+                          const winner = isCompleted ? match.fixedResult : predictions[match.id]
+                          return (
+                            <button 
+                              onClick={() => !isDisabled && handlePrediction(match.id, 'player1')} 
+                              disabled={isDisabled} 
+                              className={`w-full p-2 sm:p-3 text-left transition-all border-b border-brand-border ${
+                                isCompleted 
+                                  ? 'bg-gray-600/30 border-gray-500 cursor-not-allowed opacity-75' 
+                                  : winner === 'player1' 
+                                    ? 'bg-brand-green/20 border-brand-green' 
+                                    : match.player1 
+                                      ? 'hover:bg-brand-border/50' 
+                                      : 'cursor-not-allowed opacity-50'
+                              }`}
+                            >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                              {match.player1?.seed && (
+                                <span className="text-xs bg-brand-border text-slate-200 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded flex-shrink-0">{match.player1.seed}</span>
+                              )}
+                              <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
+                                <span className="text-white text-sm sm:text-base truncate">{match.player1?.name || 'TBD'}</span>
+                                {match.player1?.flag && <span className="text-base sm:text-lg flex-shrink-0">{match.player1.flag}</span>}
+                              </div>
+                            </div>
+                            {winner === 'player1' && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span className="text-brand-green text-lg">✓</span>
+                                {isCompleted && (
+                                  <span className="text-xs text-gray-400 font-semibold">COMPLETED</span>
                                 )}
                               </div>
-                              {match.player1.seed && (
-                                <div className="text-brand-purple text-sm sm:text-base font-medium">
-                                  #{match.player1.seed}
-                                </div>
-                              )}
-                            </div>
+                            )}
                           </div>
-                          {predictions[match.id] === 'player1' && !isCompleted && (
-                            <span className="text-green-400 text-xl sm:text-2xl">✓</span>
-                          )}
-                        </div>
-                      </button>
-                    )}
-
-                    <div className="flex items-center justify-center text-slate-400 text-sm sm:text-base font-medium">
-                      vs
-                    </div>
-
-                    {match.player2 && (
-                      <button
-                        onClick={() => handlePrediction(match.id, 'player2')}
-                        disabled={isDisabled}
-                        className={`flex-1 p-4 sm:p-6 rounded-lg border-2 transition-all ${
-                          isDisabled
-                            ? 'bg-gray-600/30 border-gray-500 cursor-not-allowed opacity-75'
-                            : predictions[match.id] === 'player2'
-                            ? 'bg-green-600/20 border-green-500 text-green-300'
-                            : 'bg-brand-panel/50 border-brand-border hover:border-brand-purple hover:bg-brand-panel/70'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <span className="text-2xl sm:text-3xl">{match.player2.flag}</span>
-                            <div>
-                              <div className="font-semibold text-white text-base sm:text-lg">
-                                {match.player2.name}
-                                {isCompleted && match.fixedResult === 'player2' && (
-                                  <span className="ml-2 text-green-400">✓ COMPLETED</span>
+                        </button>
+                        )
+                        })()}
+                        {(() => {
+                          const isCompleted = match.status === 'completed'
+                          const isDisabled = isCompleted || !match.player1 || !match.player2
+                          const winner = isCompleted ? match.fixedResult : predictions[match.id]
+                          return (
+                            <button 
+                              onClick={() => !isDisabled && handlePrediction(match.id, 'player2')} 
+                              disabled={isDisabled} 
+                              className={`w-full p-2 sm:p-3 text-left transition-all ${
+                                isCompleted 
+                                  ? 'bg-gray-600/30 border-gray-500 cursor-not-allowed opacity-75' 
+                                  : winner === 'player2' 
+                                    ? 'bg-brand-green/20 border-brand-green' 
+                                    : match.player2 
+                                      ? 'hover:bg-brand-border/50' 
+                                      : 'cursor-not-allowed opacity-50'
+                              }`}
+                            >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                              {match.player2?.seed && (
+                                <span className="text-xs bg-brand-border text-slate-200 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded flex-shrink-0">{match.player2.seed}</span>
+                              )}
+                              <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
+                                <span className="text-white text-sm sm:text-base truncate">{match.player2?.name || 'TBD'}</span>
+                                {match.player2?.flag && <span className="text-base sm:text-lg flex-shrink-0">{match.player2.flag}</span>}
+                              </div>
+                            </div>
+                            {winner === 'player2' && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span className="text-brand-green text-lg">✓</span>
+                                {isCompleted && (
+                                  <span className="text-xs text-gray-400 font-semibold">COMPLETED</span>
                                 )}
                               </div>
-                              {match.player2.seed && (
-                                <div className="text-brand-purple text-sm sm:text-base font-medium">
-                                  #{match.player2.seed}
-                                </div>
-                              )}
-                            </div>
+                            )}
                           </div>
-                          {predictions[match.id] === 'player2' && !isCompleted && (
-                            <span className="text-green-400 text-xl sm:text-2xl">✓</span>
-                          )}
-                        </div>
-                      </button>
-                    )}
+                        </button>
+                        )
+                        })()}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Preview entfernt: Fokus liegt ausschließlich auf aktueller Runde */}
+        </div>
+
+        {currentMatches.length === 0 && (
+          <div className="bg-brand-panel rounded-lg shadow-sm p-6 sm:p-8 text-center mx-2 sm:mx-0 border border-brand-border">
+            <Users className="w-10 h-10 sm:w-12 sm:h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-white mb-2">No matches available</h3>
+            <p className="text-sm sm:text-base text-slate-400">Make predictions in previous rounds first to determine players for this round.</p>
+          </div>
+        )}
+
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-brand-panel/90 backdrop-blur-sm rounded-lg p-4 text-center border border-brand-border">
+            <div className="text-2xl font-bold text-green-400">{getTotalPredictions()}</div>
+            <div className="text-sm text-slate-400">Total Predictions</div>
+          </div>
+          <div className="bg-brand-panel/90 backdrop-blur-sm rounded-lg p-4 text-center border border-brand-border">
+            <div className="text-2xl font-bold text-purple-400">{Math.round((stats.completed / stats.total) * 100)}%</div>
+            <div className="text-sm text-slate-400">Tournament Completion</div>
+          </div>
+          <div className="bg-brand-panel/90 backdrop-blur-sm rounded-lg p-4 text-center border border-brand-border">
+            <div className="text-2xl font-bold text-blue-400">{
+              rounds.filter((_, i) => {
+                const roundMatches = generateMatches(i + 1)
+                const roundPredictions = roundMatches.filter((match) => predictions[match.id]).length
+                return roundPredictions === rounds[i].matches && roundMatches.every((m) => m.player1 && m.player2)
+              }).length
+            }</div>
+            <div className="text-sm text-slate-400">Completed Rounds</div>
           </div>
         </div>
       </div>
