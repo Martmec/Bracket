@@ -487,7 +487,7 @@ const TennisTournamentSimulator: React.FC = () => {
   
 
   return (
-    <div className="min-h-screen bg-brand-navy2 bg-gradient-to-br from-brand-navy via-brand-navy2 to-brand-purple p-2 sm:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-navy via-brand-navy2 to-brand-purple p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {champion && (
           <div className="bg-gradient-to-r from-brand-purple to-brand-purple2 rounded-lg shadow-lg p-4 sm:p-6 mb-6 text-center">
@@ -509,31 +509,31 @@ const TennisTournamentSimulator: React.FC = () => {
         {/* Highlighted header + round navigation module */}
         <div className="rounded-xl overflow-hidden shadow-2xl mb-4 sm:mb-6 border border-brand-border">
           {/* Gradient header bar */}
-          <div className="bg-gradient-to-r from-brand-purple to-brand-purple2 p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-brand-purple to-brand-purple2 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="text-center sm:text-left">
                 <h1 className="text-xl sm:text-2xl font-bold text-white">{tournamentConfig.name}</h1>
                 <p className="text-sm text-white/80">Men's Singles</p>
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={exportToPDF} className="flex items-center gap-2 bg-brand-green text-white px-3 py-2 rounded-lg hover:bg-brand-green/80 transition-colors text-sm">
+              <div className="flex flex-wrap items-center gap-3">
+                <button onClick={exportToPDF} className="flex items-center gap-2 bg-brand-green text-white px-4 py-3 rounded-lg hover:bg-brand-green/80 transition-colors text-sm">
                   <Download className="w-4 h-4" /> PDF
                 </button>
-                <button onClick={exportPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-3 py-2 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <button onClick={exportPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                   <Download className="w-4 h-4" /> JSON
                 </button>
-                <button onClick={clearAllPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-3 py-2 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <button onClick={clearAllPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                   <RotateCcw className="w-4 h-4" /> Reset
                 </button>
-                <button onClick={shareResults} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-3 py-2 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <button onClick={shareResults} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                   <Share2 className="w-4 h-4" /> Share
                 </button>
               </div>
             </div>
           </div>
           {/* Navigation body */}
-          <div className="bg-brand-panel/90 backdrop-blur-sm p-3 sm:p-4 border-t border-brand-border">
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="bg-brand-panel/90 backdrop-blur-sm p-4 sm:p-6 border-t border-brand-border">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {rounds.map((round) => {
                 const roundMatches = generateMatches(round.id)
                 const roundPredictions = roundMatches.filter((m) => predictions[m.id]).length
@@ -558,15 +558,15 @@ const TennisTournamentSimulator: React.FC = () => {
         </div>
 
         {/* Ad Space */}
-        <div className="bg-brand-panel/90 backdrop-blur-sm rounded-lg shadow-sm p-8 mb-4 sm:mb-6 border border-brand-border text-center">
+        <div className="bg-brand-panel/90 backdrop-blur-sm rounded-lg shadow-sm p-6 mb-4 sm:mb-6 border border-brand-border text-center">
           <div className="text-brand-cream/60 text-sm">
             Advertisement Space
           </div>
         </div>
 
-        <div className="flex gap-4 sm:gap-8">
+        <div className="flex gap-6 sm:gap-8">
           <div className="flex-1">
-            <h2 className="text-base sm:text-lg font-semibold text-white mb-4">{currentRound <= 7 ? `Round of ${rounds[currentRound - 1].players}` : 'Tournament Complete'}</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 px-4">{currentRound <= 7 ? `Round of ${rounds[currentRound - 1].players}` : 'Tournament Complete'}</h2>
             <div className="space-y-3 sm:space-y-4">
               {currentMatches.map((match, index) => {
                 return (

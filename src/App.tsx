@@ -2,7 +2,7 @@ import TennisTournamentSimulator from './components/TennisTournamentSimulator'
 
 function App() {
   return (
-    <main style={{ padding: 24, fontFamily: 'system-ui, sans-serif' }}>
+    <main style={{ fontFamily: 'system-ui, sans-serif' }}>
       <TennisTournamentSimulator />
     </main>
   )
