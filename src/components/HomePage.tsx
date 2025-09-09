@@ -87,12 +87,14 @@ const HomePage: React.FC = () => {
 
         {/* Tournament Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {tournaments.map((tournament) => (
-            <Link
-              key={tournament.id}
-              to={`/${tournament.id}`}
-              className="group block bg-brand-panel/90 backdrop-blur-sm rounded-xl border border-brand-border hover:border-brand-purple transition-all duration-300 hover:shadow-lg hover:shadow-brand-purple/20 overflow-hidden"
-            >
+          {tournaments.map((tournament) => {
+            const isComingSoon = tournament.status === 'upcoming'
+            const CardContent = () => (
+              <div className={`group block bg-brand-panel/90 backdrop-blur-sm rounded-xl border border-brand-border transition-all duration-300 overflow-hidden ${
+                isComingSoon 
+                  ? 'cursor-not-allowed opacity-75' 
+                  : 'hover:border-brand-purple hover:shadow-lg hover:shadow-brand-purple/20'
+              }`}>
               {/* Status Badge */}
               <div className="relative">
                 <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-white ${getStatusColor(tournament.status)}`}>
@@ -127,15 +129,30 @@ const HomePage: React.FC = () => {
 
                 {/* Action Button */}
                 <div className="flex justify-center">
-                  <div className="bg-brand-purple text-white px-6 py-3 rounded-lg font-semibold group-hover:bg-brand-purple/80 transition-colors">
+                  <div className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                    isComingSoon 
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                      : 'bg-brand-purple text-white group-hover:bg-brand-purple/80'
+                  }`}>
                     {tournament.status === 'active' ? 'Make Predictions' : 
-                     tournament.status === 'upcoming' ? 'View Tournament' : 
+                     tournament.status === 'upcoming' ? 'Coming Soon' : 
                      'View Results'}
                   </div>
                 </div>
               </div>
-            </Link>
-          ))}
+            </div>
+            )
+
+            return isComingSoon ? (
+              <div key={tournament.id}>
+                <CardContent />
+              </div>
+            ) : (
+              <Link key={tournament.id} to={`/${tournament.id}`}>
+                <CardContent />
+              </Link>
+            )
+          })}
         </div>
 
         {/* Footer Info */}
