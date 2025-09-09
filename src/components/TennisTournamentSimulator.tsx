@@ -391,7 +391,7 @@ const TennisTournamentSimulator: React.FC = () => {
       yPosition += 10
 
       doc.setFont('helvetica', 'normal')
-      roundMatches.forEach((match, index) => {
+      roundMatches.forEach((match) => {
         if (yPosition > pageHeight - 20) {
           doc.addPage()
           yPosition = 20
