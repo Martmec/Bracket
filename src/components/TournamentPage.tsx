@@ -595,7 +595,7 @@ const TournamentPage: React.FC = () => {
                     case 'R16': return 'Round of 16'
                     case 'QF': return 'Quarterfinals'
                     case 'SF': return 'Semifinals'
-                    case 'F': return 'Finals'
+                    case 'F': return 'Final'
                     default: return `Round of ${round.players}`
                   }
                 })() : 
