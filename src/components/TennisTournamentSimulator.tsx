@@ -241,7 +241,15 @@ const TennisTournamentSimulator: React.FC = () => {
   }, [predictions])
 
   const getMatchWinner = (matchId: string, match: Match | undefined): Player | null => {
-    if (!predictions[matchId] || !match) return null
+    if (!match) return null
+    
+    // Check if match has a fixed result first
+    if (fixedResults[matchId]) {
+      return fixedResults[matchId] === 'player1' ? match.player1 : match.player2
+    }
+    
+    // Otherwise check predictions
+    if (!predictions[matchId]) return null
     return predictions[matchId] === 'player1' ? match.player1 : match.player2
   }
 
@@ -535,11 +543,6 @@ const TennisTournamentSimulator: React.FC = () => {
               {currentMatches.map((match, index) => {
                 return (
                   <div key={match.id} className="relative">
-                    {match.status === 'completed' && (
-                      <div className="text-xs text-gray-400 font-semibold mb-2 text-center">
-                        ✓ COMPLETED
-                      </div>
-                    )}
                     <div className="bg-brand-panel border border-brand-border rounded-lg overflow-hidden">
                       <div className="px-3 py-1 bg-brand-border border-b border-brand-border">
                         <span className="text-slate-400 text-xs">Game {match.matchNumber || index + 1}</span>
@@ -573,7 +576,14 @@ const TennisTournamentSimulator: React.FC = () => {
                                 {match.player1?.flag && <span className="text-base sm:text-lg flex-shrink-0">{match.player1.flag}</span>}
                               </div>
                             </div>
-                            {winner === 'player1' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
+                            {winner === 'player1' && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span className="text-brand-green text-lg">✓</span>
+                                {isCompleted && (
+                                  <span className="text-xs text-gray-400 font-semibold">COMPLETED</span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </button>
                         )
@@ -606,7 +616,14 @@ const TennisTournamentSimulator: React.FC = () => {
                                 {match.player2?.flag && <span className="text-base sm:text-lg flex-shrink-0">{match.player2.flag}</span>}
                               </div>
                             </div>
-                            {winner === 'player2' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
+                            {winner === 'player2' && (
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span className="text-brand-green text-lg">✓</span>
+                                {isCompleted && (
+                                  <span className="text-xs text-gray-400 font-semibold">COMPLETED</span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </button>
                         )
