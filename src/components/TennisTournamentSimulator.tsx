@@ -295,34 +295,18 @@ const TennisTournamentSimulator: React.FC = () => {
 
 
   const shareResults = async () => {
-    // Create short URL (fallback to normal URL)
-    const createShortURL = async (longUrl: string) => {
-      try {
-        // Use is.gd (no API required)
-        const response = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`)
-        const shortUrl = await response.text()
-        return shortUrl.trim() || longUrl
-      } catch (error) {
-        console.log('URL shortening failed, using original URL')
-        return longUrl // Fallback to original URL
-      }
-    }
-
     const data = btoa(JSON.stringify(predictions))
     const currentDomain = window.location.origin
     const longUrl = `${currentDomain}/${tournamentConfig.slug}?predictions=${data}`
     
-    // Create short URL
-    const shortUrl = await createShortURL(longUrl)
-    
-    // Copy ONLY the short URL to clipboard
+    // Copy the URL directly to clipboard (no short URL due to CORS issues)
     try {
-      await navigator.clipboard.writeText(shortUrl)
+      await navigator.clipboard.writeText(longUrl)
       alert('Share link copied to clipboard!')
     } catch (error) {
       // Fallback for older browsers
       const textArea = document.createElement('textarea')
-      textArea.value = shortUrl
+      textArea.value = longUrl
       document.body.appendChild(textArea)
       textArea.select()
       document.execCommand('copy')
