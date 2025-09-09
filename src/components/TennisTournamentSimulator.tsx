@@ -368,51 +368,13 @@ const TennisTournamentSimulator: React.FC = () => {
     doc.text(`${tournamentConfig.category} • ${tournamentConfig.dates}`, pageWidth / 2, yPosition, { align: 'center' })
     yPosition += 20
 
-    // Tournament Info
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Tournament Information', 20, yPosition)
-    yPosition += 10
-
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
-    doc.text(`Players: ${players.length}`, 20, yPosition)
-    yPosition += 6
-    doc.text(`Seeded Players: ${players.filter(p => p.seed).length}`, 20, yPosition)
-    yPosition += 6
-    doc.text(`Total Matches: ${getCompletionStats().total}`, 20, yPosition)
-    yPosition += 6
-    doc.text(`Predictions Made: ${getCompletionStats().completed}`, 20, yPosition)
-    yPosition += 15
-
-    // Players List
-    doc.setFontSize(14)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Players', 20, yPosition)
-    yPosition += 10
-
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
-    players.forEach((player, index) => {
-      if (yPosition > pageHeight - 20) {
-        doc.addPage()
-        yPosition = 20
-      }
-      
-      const seedText = player.seed ? ` (${player.seed})` : ''
-      doc.text(`${index + 1}. ${player.name}${seedText}`, 20, yPosition)
-      yPosition += 6
-    })
-
-    yPosition += 10
-
     // Tournament Bracket
-    doc.setFontSize(14)
+    doc.setFontSize(16)
     doc.setFont('helvetica', 'bold')
     doc.text('Tournament Bracket', 20, yPosition)
-    yPosition += 10
+    yPosition += 15
 
-    doc.setFontSize(10)
+    doc.setFontSize(11)
     doc.setFont('helvetica', 'normal')
     
     for (let round = 1; round <= totalRounds; round++) {
@@ -426,7 +388,7 @@ const TennisTournamentSimulator: React.FC = () => {
       
       doc.setFont('helvetica', 'bold')
       doc.text(roundName, 20, yPosition)
-      yPosition += 8
+      yPosition += 10
 
       doc.setFont('helvetica', 'normal')
       roundMatches.forEach((match, index) => {
@@ -439,16 +401,33 @@ const TennisTournamentSimulator: React.FC = () => {
         const player2Name = match.player2?.name || 'TBD'
         const prediction = predictions[match.id]
         
-        let matchText = `Match ${index + 1}: ${player1Name} vs ${player2Name}`
         if (prediction) {
           const winner = prediction === 'player1' ? player1Name : player2Name
-          matchText += ` → Winner: ${winner}`
+          const loser = prediction === 'player1' ? player2Name : player1Name
+          
+          // Winner underlined
+          doc.setFont('helvetica', 'bold')
+          doc.text(winner, 30, yPosition)
+          const winnerWidth = doc.getTextWidth(winner)
+          
+          // " wins vs. "
+          doc.setFont('helvetica', 'normal')
+          doc.text(' wins vs. ', 30 + winnerWidth, yPosition)
+          const winsTextWidth = doc.getTextWidth(' wins vs. ')
+          
+          // Loser
+          doc.text(loser, 30 + winnerWidth + winsTextWidth, yPosition)
+          
+          // Underline the winner
+          doc.line(30, yPosition + 1, 30 + winnerWidth, yPosition + 1)
+        } else {
+          // No prediction made
+          doc.text(`${player1Name} vs ${player2Name}`, 30, yPosition)
         }
         
-        doc.text(matchText, 30, yPosition)
-        yPosition += 6
+        yPosition += 8
       })
-      yPosition += 5
+      yPosition += 8
     }
 
     // Save PDF
