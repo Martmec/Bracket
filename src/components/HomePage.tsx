@@ -67,8 +67,8 @@ const HomePage: React.FC = () => {
               Your Tennis Bracket
             </h1>
             <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto">
-              Predict tournament outcomes, track your accuracy, and compete with friends. 
-              Make your picks for the biggest tennis tournaments around the world.
+              Predict tournament outcomes and compete with friends. 
+              Make your picks for tennis tournaments around the world.
             </p>
           </div>
         </div>
