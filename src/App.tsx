@@ -1,10 +1,17 @@
-import TennisTournamentSimulator from './components/TennisTournamentSimulator'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import HomePage from './components/HomePage'
+import TournamentPage from './components/TournamentPage'
 
 function App() {
   return (
-    <main style={{ fontFamily: 'system-ui, sans-serif' }}>
-      <TennisTournamentSimulator />
-    </main>
+    <Router>
+      <main style={{ fontFamily: 'system-ui, sans-serif' }}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/:tournamentId" element={<TournamentPage />} />
+        </Routes>
+      </main>
+    </Router>
   )
 }
 
