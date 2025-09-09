@@ -17,6 +17,20 @@ type Match = {
   round: number
   matchNumber?: number
   dependsOn?: string[]
+  status?: 'upcoming' | 'completed'
+  fixedResult?: 'player1' | 'player2'
+}
+
+// Fixed results for already played matches
+// These can be manually updated daily
+const fixedResults: Record<string, 'player1' | 'player2'> = {
+  // Example: Round 1 - some matches already played
+  'r1-m1': 'player1', // Jannik Sinner wins against Mackenzie McDonald
+  'r1-m2': 'player2', // Christopher O'Connell wins against Roberto Carballes Baena
+  'r1-m3': 'player1', // Tommy Paul wins against Mariano Navone
+  'r1-m4': 'player2', // Gabriel Diallo wins against [TBD]
+  // Add more fixed results here as matches are completed
+  // Format: 'r{round}-m{match}': 'player1' or 'player2'
 }
 
 const generatePlayers = (): Player[] => {
@@ -240,13 +254,24 @@ const TennisTournamentSimulator: React.FC = () => {
       for (let i = 0; i < firstRoundMatches; i++) {
         const player1 = players[i * 2]
         const player2 = players[i * 2 + 1]
-        matches.push({
-          id: `r1-m${i + 1}`,
+        const matchId = `r1-m${i + 1}`
+        const match: Match = {
+          id: matchId,
           player1,
           player2,
           round: 1,
           matchNumber: i + 1
-        })
+        }
+        
+        // Check if match is already completed
+        if (fixedResults[matchId]) {
+          match.status = 'completed'
+          match.fixedResult = fixedResults[matchId]
+        } else {
+          match.status = 'upcoming'
+        }
+        
+        matches.push(match)
       }
       return matches
     }
@@ -260,14 +285,25 @@ const TennisTournamentSimulator: React.FC = () => {
       const match2Id = `r${roundId - 1}-m${i * 2 + 2}`
       const winner1 = getMatchWinner(match1Id, prevRoundMatches[i * 2])
       const winner2 = getMatchWinner(match2Id, prevRoundMatches[i * 2 + 1])
-      matches.push({
-        id: `r${roundId}-m${i + 1}`,
+      const matchId = `r${roundId}-m${i + 1}`
+      const match: Match = {
+        id: matchId,
         player1: winner1,
         player2: winner2,
         round: roundId,
         dependsOn: [match1Id, match2Id],
         matchNumber: i + 1
-      })
+      }
+      
+      // Check if match is already completed
+      if (fixedResults[matchId]) {
+        match.status = 'completed'
+        match.fixedResult = fixedResults[matchId]
+      } else {
+        match.status = 'upcoming'
+      }
+      
+      matches.push(match)
     }
     return matches
   }
@@ -275,6 +311,11 @@ const TennisTournamentSimulator: React.FC = () => {
   const currentMatches = generateMatches(currentRound)
 
   const handlePrediction = (matchId: string, winner: 'player1' | 'player2') => {
+    // Check if match is already completed
+    if (fixedResults[matchId]) {
+      return // No changes allowed for completed matches
+    }
+    
     setPredictions((prev) => ({
       ...prev,
       [matchId]: winner
@@ -501,7 +542,24 @@ const TennisTournamentSimulator: React.FC = () => {
                         <span className="text-slate-400 text-xs">Game {match.matchNumber || index + 1}</span>
                       </div>
                       <div>
-                        <button onClick={() => handlePrediction(match.id, 'player1')} disabled={!match.player1} className={`w-full p-2 sm:p-3 text-left transition-all border-b border-brand-border ${predictions[match.id] === 'player1' ? 'bg-brand-green/20 border-brand-green' : match.player1 ? 'hover:bg-brand-border/50' : 'cursor-not-allowed opacity-50'}`}>
+                        {(() => {
+                          const isCompleted = match.status === 'completed'
+                          const isDisabled = isCompleted || !match.player1 || !match.player2
+                          const winner = isCompleted ? match.fixedResult : predictions[match.id]
+                          return (
+                            <button 
+                              onClick={() => !isDisabled && handlePrediction(match.id, 'player1')} 
+                              disabled={isDisabled} 
+                              className={`w-full p-2 sm:p-3 text-left transition-all border-b border-brand-border ${
+                                isCompleted 
+                                  ? 'bg-gray-600/30 border-gray-500 cursor-not-allowed opacity-75' 
+                                  : winner === 'player1' 
+                                    ? 'bg-brand-green/20 border-brand-green' 
+                                    : match.player1 
+                                      ? 'hover:bg-brand-border/50' 
+                                      : 'cursor-not-allowed opacity-50'
+                              }`}
+                            >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                               {match.player1?.seed && (
@@ -512,10 +570,34 @@ const TennisTournamentSimulator: React.FC = () => {
                                 {match.player1?.flag && <span className="text-base sm:text-lg flex-shrink-0">{match.player1.flag}</span>}
                               </div>
                             </div>
-                            {predictions[match.id] === 'player1' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
+                            {winner === 'player1' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
+                            {isCompleted && (
+                              <div className="text-xs text-gray-400 font-semibold mb-1">
+                                ✓ COMPLETED
+                              </div>
+                            )}
                           </div>
                         </button>
-                        <button onClick={() => handlePrediction(match.id, 'player2')} disabled={!match.player2} className={`w-full p-2 sm:p-3 text-left transition-all ${predictions[match.id] === 'player2' ? 'bg-brand-green/20 border-brand-green' : match.player2 ? 'hover:bg-brand-border/50' : 'cursor-not-allowed opacity-50'}`}>
+                        )
+                        })()}
+                        {(() => {
+                          const isCompleted = match.status === 'completed'
+                          const isDisabled = isCompleted || !match.player1 || !match.player2
+                          const winner = isCompleted ? match.fixedResult : predictions[match.id]
+                          return (
+                            <button 
+                              onClick={() => !isDisabled && handlePrediction(match.id, 'player2')} 
+                              disabled={isDisabled} 
+                              className={`w-full p-2 sm:p-3 text-left transition-all ${
+                                isCompleted 
+                                  ? 'bg-gray-600/30 border-gray-500 cursor-not-allowed opacity-75' 
+                                  : winner === 'player2' 
+                                    ? 'bg-brand-green/20 border-brand-green' 
+                                    : match.player2 
+                                      ? 'hover:bg-brand-border/50' 
+                                      : 'cursor-not-allowed opacity-50'
+                              }`}
+                            >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                               {match.player2?.seed && (
@@ -526,9 +608,16 @@ const TennisTournamentSimulator: React.FC = () => {
                                 {match.player2?.flag && <span className="text-base sm:text-lg flex-shrink-0">{match.player2.flag}</span>}
                               </div>
                             </div>
-                            {predictions[match.id] === 'player2' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
+                            {winner === 'player2' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
+                            {isCompleted && (
+                              <div className="text-xs text-gray-400 font-semibold mb-1">
+                                ✓ COMPLETED
+                              </div>
+                            )}
                           </div>
                         </button>
+                        )
+                        })()}
                       </div>
                     </div>
                   </div>
