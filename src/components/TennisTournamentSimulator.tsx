@@ -24,11 +24,9 @@ type Match = {
 // Fixed results for already played matches
 // These can be manually updated daily
 const fixedResults: Record<string, 'player1' | 'player2'> = {
-  // Example: Round 1 - some matches already played
+  // Example: Round 1 - only the first match is completed
   'r1-m1': 'player1', // Jannik Sinner wins against Mackenzie McDonald
-  'r1-m2': 'player2', // Christopher O'Connell wins against Roberto Carballes Baena
-  'r1-m3': 'player1', // Tommy Paul wins against Mariano Navone
-  'r1-m4': 'player2', // Gabriel Diallo wins against [TBD]
+  // Other matches are still upcoming and can be tipped
   // Add more fixed results here as matches are completed
   // Format: 'r{round}-m{match}': 'player1' or 'player2'
 }
@@ -537,6 +535,11 @@ const TennisTournamentSimulator: React.FC = () => {
               {currentMatches.map((match, index) => {
                 return (
                   <div key={match.id} className="relative">
+                    {match.status === 'completed' && (
+                      <div className="text-xs text-gray-400 font-semibold mb-2 text-center">
+                        ✓ COMPLETED
+                      </div>
+                    )}
                     <div className="bg-brand-panel border border-brand-border rounded-lg overflow-hidden">
                       <div className="px-3 py-1 bg-brand-border border-b border-brand-border">
                         <span className="text-slate-400 text-xs">Game {match.matchNumber || index + 1}</span>
@@ -571,11 +574,6 @@ const TennisTournamentSimulator: React.FC = () => {
                               </div>
                             </div>
                             {winner === 'player1' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
-                            {isCompleted && (
-                              <div className="text-xs text-gray-400 font-semibold mb-1">
-                                ✓ COMPLETED
-                              </div>
-                            )}
                           </div>
                         </button>
                         )
@@ -609,11 +607,6 @@ const TennisTournamentSimulator: React.FC = () => {
                               </div>
                             </div>
                             {winner === 'player2' && <span className="text-brand-green text-lg flex-shrink-0">✓</span>}
-                            {isCompleted && (
-                              <div className="text-xs text-gray-400 font-semibold mb-1">
-                                ✓ COMPLETED
-                              </div>
-                            )}
                           </div>
                         </button>
                         )
