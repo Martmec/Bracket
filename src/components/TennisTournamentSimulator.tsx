@@ -309,12 +309,13 @@ const TennisTournamentSimulator: React.FC = () => {
     }
 
     const data = btoa(JSON.stringify(predictions))
-    const longUrl = `yourtennisbracket.com/${tournamentConfig.slug}?predictions=${data}`
+    const currentDomain = window.location.origin
+    const longUrl = `${currentDomain}/${tournamentConfig.slug}?predictions=${data}`
     
     // Create short URL
     const shortUrl = await createShortURL(longUrl)
     
-    // Copy short URL directly to clipboard
+    // Copy ONLY the short URL to clipboard
     try {
       await navigator.clipboard.writeText(shortUrl)
       alert('Share link copied to clipboard!')
