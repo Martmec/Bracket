@@ -412,10 +412,15 @@ const TennisTournamentSimulator: React.FC = () => {
         const player1Name = match.player1?.name || 'TBD'
         const player2Name = match.player2?.name || 'TBD'
         const prediction = predictions[match.id]
+        const fixedResult = fixedResults[match.id]
+        const isCompleted = match.status === 'completed'
         
-        if (prediction) {
-          const winner = prediction === 'player1' ? player1Name : player2Name
-          const loser = prediction === 'player1' ? player2Name : player1Name
+        // Check if we have either a prediction or fixed result
+        const result = fixedResult || prediction
+        
+        if (result) {
+          const winner = result === 'player1' ? player1Name : player2Name
+          const loser = result === 'player1' ? player2Name : player1Name
           
           // Winner underlined
           doc.setFont('helvetica', 'bold')
@@ -429,6 +434,13 @@ const TennisTournamentSimulator: React.FC = () => {
           
           // Loser
           doc.text(loser, 30 + winnerWidth + winsTextWidth, yPosition)
+          
+          // Add "(Already completed)" for fixed results
+          if (isCompleted) {
+            const loserWidth = doc.getTextWidth(loser)
+            doc.setFont('helvetica', 'italic')
+            doc.text(' (Already completed)', 30 + winnerWidth + winsTextWidth + loserWidth, yPosition)
+          }
           
           // Underline the winner
           doc.line(30, yPosition + 1, 30 + winnerWidth, yPosition + 1)
@@ -509,8 +521,17 @@ const TennisTournamentSimulator: React.FC = () => {
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               {rounds.map((round) => {
                 const roundMatches = generateMatches(round.id)
-                const roundPredictions = roundMatches.filter((m) => predictions[m.id]).length
-                const isComplete = roundPredictions === round.matches && roundMatches.every((m) => m.player1 && m.player2)
+                const isComplete = roundMatches.every((m) => {
+                  // Check if match is completed (either fixed result or user prediction)
+                  const hasFixedResult = fixedResults[m.id]
+                  const hasUserPrediction = predictions[m.id]
+                  const isMatchComplete = hasFixedResult || hasUserPrediction
+                  
+                  // Also check that both players exist
+                  const hasBothPlayers = m.player1 && m.player2
+                  
+                  return isMatchComplete && hasBothPlayers
+                })
                 const isActive = currentRound === round.id
                 return (
                   <button
