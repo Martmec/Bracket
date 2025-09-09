@@ -25,11 +25,8 @@ type Match = {
 // Fixed results for already played matches
 // These can be manually updated daily
 const fixedResults: Record<string, 'player1' | 'player2'> = {
-  // Round 1 - completed matches
-  'r1-m1': 'player1', // Jannik Sinner wins against Mackenzie McDonald
-  'r1-m3': 'player2', // Tommy Paul wins against Mariano Navone
-  // Other matches are still upcoming and can be tipped
-  // Add more fixed results here as matches are completed
+  // No completed matches - all games can be tipped
+  // Add fixed results here as matches are completed
   // Format: 'r{round}-m{match}': 'player1' or 'player2'
 }
 
