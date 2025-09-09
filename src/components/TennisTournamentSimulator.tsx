@@ -293,21 +293,6 @@ const TennisTournamentSimulator: React.FC = () => {
     }
   }
 
-  const exportPredictions = () => {
-    const data = {
-      predictions,
-      tournament: tournamentConfig,
-      timestamp: new Date().toISOString(),
-      url: `yourtennisbracket.com/${tournamentConfig.slug}`
-    }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${tournamentConfig.slug}-predictions.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
 
   const shareResults = async () => {
     // Create a beautiful summary
@@ -518,9 +503,6 @@ const TennisTournamentSimulator: React.FC = () => {
               <div className="flex flex-wrap items-center gap-3">
                 <button onClick={exportToPDF} className="flex items-center gap-2 bg-brand-green text-white px-4 py-3 rounded-lg hover:bg-brand-green/80 transition-colors text-sm">
                   <Download className="w-4 h-4" /> PDF
-                </button>
-                <button onClick={exportPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                  <Download className="w-4 h-4" /> JSON
                 </button>
                 <button onClick={clearAllPredictions} disabled={getTotalPredictions() === 0} className="flex items-center gap-2 bg-white/10 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                   <RotateCcw className="w-4 h-4" /> Reset
