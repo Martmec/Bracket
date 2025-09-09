@@ -33,7 +33,7 @@ const tournaments: Tournament[] = [
     location: 'São Paulo, Brazil',
     surface: 'Hard',
     players: 32,
-    status: 'upcoming',
+    status: 'active',
     description: ''
   },
   {
