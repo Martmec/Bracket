@@ -175,26 +175,56 @@ const HomePage: React.FC = () => {
         {/* Footer */}
         <footer className="mt-16 sm:mt-20 pt-8 border-t border-brand-border">
           <div className="text-center">
-            <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mb-6">
-              <Link 
-                to="/impressum" 
-                className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
-              >
-                Impressum
-              </Link>
-              <Link 
-                to="/datenschutz" 
-                className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
-              >
-                Datenschutz
-              </Link>
-              <Link 
-                to="/terms" 
-                className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
-              >
-                Nutzungsbedingungen
-              </Link>
+            {/* Legal Links - German */}
+            <div className="mb-4">
+              <h4 className="text-white font-semibold mb-3">Deutsch</h4>
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+                <Link 
+                  to="/impressum" 
+                  className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+                >
+                  Impressum
+                </Link>
+                <Link 
+                  to="/datenschutz" 
+                  className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+                >
+                  Datenschutz
+                </Link>
+                <Link 
+                  to="/terms" 
+                  className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+                >
+                  Nutzungsbedingungen
+                </Link>
+              </div>
             </div>
+
+            {/* Legal Links - English */}
+            <div className="mb-6">
+              <h4 className="text-white font-semibold mb-3">English</h4>
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+                <Link 
+                  to="/impressum-en" 
+                  className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+                >
+                  Imprint
+                </Link>
+                <Link 
+                  to="/privacy" 
+                  className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+                >
+                  Privacy Policy
+                </Link>
+                <Link 
+                  to="/terms-en" 
+                  className="text-slate-300 hover:text-brand-purple transition-colors text-sm sm:text-base"
+                >
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+
             <p className="text-slate-400 text-xs sm:text-sm">
               © 2025 Your Tennis Bracket. All rights reserved.
             </p>
