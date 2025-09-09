@@ -1,4 +1,3 @@
-import * as React from 'react'
 import TennisTournamentSimulator from './components/TennisTournamentSimulator'
 
 function App() {

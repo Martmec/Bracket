@@ -281,9 +281,6 @@ const TennisTournamentSimulator: React.FC = () => {
     }))
   }
 
-  const getTippedCount = () => {
-    return currentMatches.filter((match) => predictions[match.id]).length
-  }
 
   const getTotalPredictions = () => {
     return Object.keys(predictions).length
