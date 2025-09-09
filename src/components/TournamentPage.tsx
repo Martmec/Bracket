@@ -193,7 +193,7 @@ const generatePlayers = (): Player[] => {
 // Tournament configurations
 const tournamentConfigs = {
   tokyo2025: {
-    name: 'Tokyo Open 2025',
+    name: 'Tokyo 2025',
     location: 'Tokyo, Japan',
     surface: 'Hard',
     category: '500 Series',
@@ -201,7 +201,7 @@ const tournamentConfigs = {
     slug: 'tokyo-2025'
   },
   beijing2025: {
-    name: 'Beijing Open 2025',
+    name: 'Beijing 2025',
     location: 'Beijing, China',
     surface: 'Hard',
     category: '500 Series',

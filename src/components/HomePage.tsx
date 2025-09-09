@@ -16,25 +16,25 @@ interface Tournament {
 const tournaments: Tournament[] = [
   {
     id: 'tokyo2025',
-    name: 'Tokyo Open 2025',
+    name: 'Tokyo 2025',
     category: '500 Series',
     dates: 'September 24 - 30, 2025',
     location: 'Tokyo, Japan',
     surface: 'Hard',
     players: 32,
     status: 'active',
-    description: 'ATP 500 tournament featuring top players in Tokyo. First round matches are underway!'
+    description: ''
   },
   {
     id: 'beijing2025',
-    name: 'Beijing Open 2025',
+    name: 'Beijing 2025',
     category: '500 Series',
     dates: 'September 25 - October 1, 2025',
     location: 'Beijing, China',
     surface: 'Hard',
     players: 32,
     status: 'upcoming',
-    description: 'ATP 500 tournament in Beijing. Coming soon - get ready to make your predictions!'
+    description: ''
   }
 ]
 
@@ -102,11 +102,11 @@ const HomePage: React.FC = () => {
 
               {/* Tournament Info */}
               <div className="p-6 sm:p-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-brand-purple transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 pr-16 group-hover:text-brand-purple transition-colors">
                   {tournament.name}
                 </h3>
                 
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2 mb-6">
                   <div className="flex items-center text-slate-300">
                     <span className="text-brand-purple mr-2">📍</span>
                     <span className="text-sm sm:text-base">{tournament.location}</span>
@@ -124,10 +124,6 @@ const HomePage: React.FC = () => {
                     <span className="text-sm sm:text-base">{tournament.surface} • {tournament.players} players</span>
                   </div>
                 </div>
-
-                <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-6">
-                  {tournament.description}
-                </p>
 
                 {/* Action Button */}
                 <div className="flex justify-center">
@@ -148,16 +144,11 @@ const HomePage: React.FC = () => {
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
               How It Works
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 text-slate-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 text-slate-300">
               <div className="text-center">
                 <div className="text-3xl mb-3">🎯</div>
                 <h4 className="font-semibold text-white mb-2">Make Predictions</h4>
                 <p className="text-sm sm:text-base">Pick winners for each match in the tournament bracket</p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-3">📊</div>
-                <h4 className="font-semibold text-white mb-2">Track Progress</h4>
-                <p className="text-sm sm:text-base">See your accuracy as matches are completed</p>
               </div>
               <div className="text-center">
                 <div className="text-3xl mb-3">🏆</div>
