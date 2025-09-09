@@ -295,30 +295,6 @@ const TennisTournamentSimulator: React.FC = () => {
 
 
   const shareResults = async () => {
-    // Create a beautiful summary
-    const generateSummary = () => {
-      let summary = `🏆 ${tournamentConfig.name} - My Predictions\n\n`
-      
-      // Add champion
-      if (champion) {
-        summary += `👑 Champion: ${champion.name} ${champion.flag}${champion.seed ? ` (${champion.seed})` : ''}\n\n`
-      }
-      
-      // Round summary
-      for (let round = 1; round <= totalRounds; round++) {
-        const roundMatches = generateMatches(round)
-        const roundName = rounds[round - 1]?.name || `Round ${round}`
-        const roundPredictions = roundMatches.filter(match => predictions[match.id]).length
-        
-        if (roundPredictions > 0) {
-          summary += `📊 ${roundName}: ${roundPredictions} predictions\n`
-        }
-      }
-      
-      summary += `\n📈 Total: ${getTotalPredictions()}/${getCompletionStats().total} predictions (${Math.round((getTotalPredictions() / getCompletionStats().total) * 100)}%)`
-      return summary
-    }
-
     // Create short URL (fallback to normal URL)
     const createShortURL = async (longUrl: string) => {
       try {
@@ -338,16 +314,19 @@ const TennisTournamentSimulator: React.FC = () => {
     // Create short URL
     const shortUrl = await createShortURL(longUrl)
     
-    const shareText = `${generateSummary()}\n\n🔗 View my complete bracket: ${shortUrl}`
-    
-    if (navigator.share) {
-      navigator.share({
-        title: `My ${tournamentConfig.name} Predictions`,
-        text: shareText
-      })
-    } else {
-      navigator.clipboard.writeText(shareText)
-      alert('Tournament summary copied to clipboard!')
+    // Copy short URL directly to clipboard
+    try {
+      await navigator.clipboard.writeText(shortUrl)
+      alert('Share link copied to clipboard!')
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = shortUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      alert('Share link copied to clipboard!')
     }
   }
 
